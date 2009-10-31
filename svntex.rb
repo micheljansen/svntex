@@ -3,6 +3,7 @@ require 'rubygems'
 require 'open-uri' 
 require 'nokogiri'
 require 'yaml'
+require 'erb'
 
 REPOSITORY_URL = 'https://svn.micheljansen.org/onspot/trunk/'
 ROOT_PATH = File.join('/','home','dawuss','svntex');
@@ -81,7 +82,6 @@ class Report
     end
   end
   
-  #appends to file only
   def append(data)
     @data << data
     yaml_string = [data].to_yaml
@@ -108,42 +108,9 @@ class Report
   end
   
   def to_html
-    content_lines = @data.map do |line|
-      msg = (line[:message].length < 100) ? line[:message] : "#{line[:message][0..97]}..."
-      
-      link_or_error = line[:info].length > 1 ? line[:info] : "<a href=\"#{line[:file]}\">download</a>"
-      
-      <<-EOF
-        <tr>
-          <td>#{line[:revision]}</td>
-          <td>#{line[:author]}</td>
-          <td>#{msg}</td>
-          <td>#{link_or_error}</td>
-        </tr>
-      EOF
-    end
+    template = File.read("template.html.erb")
     
-    return <<-EOF
-      <html>
-    	  <head>
-    	    <title>PDF history</title>
-    	  </head>
-    	  
-    	  <body>
-      	  <table>
-      	    <tr>
-              <th>Rev.</th>
-              <th>Author</th>
-              <th>Commit message</th>
-              <th>Result</th>
-            </tr>
-            
-      	    #{content_lines.join("\n")}
-      	  </table>
-    	  </body>
-    	  
-    	</html>
-    	EOF
+    ERB.new(template).result(binding)
   end
   
   def self.load(filename)

@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <title>PDF history</title>
+  </head>
+
+  <body>
+    <table>
+      <tr>
+        <th>Rev.</th>
+        <th>Author</th>
+        <th>Commit message</th>
+        <th>Result</th>
+      </tr>
+
+      <% @data.each do |line| %>
+      <tr>
+        <td><%= line[:revision] %></td>
+        <td><%= line[:author] %></td>
+        <td><%= (line[:message].length < 100) ? line[:message] : "#{line[:message][0..97]}..." %></td>
+        <td><%= line[:info].length > 1 ? line[:info] : "<a href=\"#{line[:file]}\">download</a>" %></td>
+      </tr>
+      <% end %>
+    </table>
+  </body>
+</html>
