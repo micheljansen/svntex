@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'open-uri' 
-require 'nokogiri'
+require 'open-uri' # only for parameterless operation
+require 'nokogiri' # only for parameterless operation
 require 'yaml'
 require 'erb'
 
@@ -186,6 +186,9 @@ rescue Exception => e
   puts status
 ensure
   exporter.cleanup
+end
+
+begin
   report = Report.load(File.join(ROOT_PATH, 'entries_db.yaml'))
   report.append({
     :revision => info[:revision], 
@@ -194,5 +197,10 @@ ensure
     :info => status,
     :file => "report-#{revision}.pdf"})
     
-  puts report.to_html
+  File.open(File.join(TARGET_PATH, 'list.html'), 'w') do |file|
+    file.write(report.to_html)
+  end
+  
+rescue Exception => e
+  puts "ERROR: could not save report: #{e}"
 end
